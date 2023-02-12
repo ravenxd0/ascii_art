@@ -1,7 +1,8 @@
 use image::{DynamicImage,GenericImageView};
 use std::env;
+use colored::*;
 
-fn convert_to_ascii(img: &DynamicImage) -> String {
+fn convert_to_ascii(img: &DynamicImage, colored: bool) -> String {
     let (width,height) = img.dimensions();
     let mut ascii_img = String::new();
 
@@ -11,8 +12,15 @@ fn convert_to_ascii(img: &DynamicImage) -> String {
             // Value of R,G,B
             let avg_brightness = (pixel[0] as f64 + pixel[1] as f64 + pixel[2] as f64 ) / 3.0; 
             // Get characters according to brightness
-            let ascii_char = get_ascii_char(avg_brightness);
-            ascii_img.push(ascii_char);
+            let ascii_char = get_ascii_char(avg_brightness,colored);
+            if colored {
+                let mut ch = format!("{ascii_char}");
+                ch = format!("{}",ch.truecolor(pixel[0],pixel[1], pixel[2]) );
+                ascii_img.push_str(&ch);
+
+            } else {
+                ascii_img.push(ascii_char );
+            }
         }
         ascii_img.push('\n');
     }
@@ -20,23 +28,36 @@ fn convert_to_ascii(img: &DynamicImage) -> String {
     ascii_img
 }
 
-fn get_ascii_char(brightness: f64) -> char {
-    let ascii_chars = " .,-~+=@";
-        //" .`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCL0QOZmwqpdbkhao*#WM&8%B@$";
+fn get_ascii_char(brightness: f64,colored: bool) -> char {
+    let ascii_chars = if !colored {
+        " .,-~+=@"
+    } else {
+        " .`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCL0QOZmwqpdbkhao*#WM&8%B@$"
+    };
     
     // Divide the range into length of ascii_chars
     let index = (brightness / 255.0 * (ascii_chars.len() as f64 - 1.0)) as usize;
-    ascii_chars.chars().nth(index).unwrap()
+    ascii_chars.chars().nth(index as usize).unwrap()
 }
 
 fn main() {
-    let args = env::args().nth(1).unwrap_or_else(|| "pug.png".to_string() );
+    let mut args = env::args();
+
+    if args.len() < 2 {
+        println!("Usage: cargo run [.jpg/.png] [any character to print colored]");
+        return;
+    }
+    args.next();
+    let image = args.next().unwrap();
+
+    let colored = args.next().is_some();
+    println!("{colored}");
     // Load the image
-    let image = image::open(args).unwrap();
+    let image = image::open(image).unwrap();
     // Resize the image
     let resized_image = image.resize_exact(80, 40, image::imageops::FilterType::CatmullRom);
 
-    let ascii_img = convert_to_ascii(&resized_image);
+    let ascii_img = convert_to_ascii(&resized_image, colored);
 
     println!("{ascii_img}");
 }
