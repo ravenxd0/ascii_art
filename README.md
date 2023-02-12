@@ -7,7 +7,11 @@ This crate provides basic image processing functions and methods for converting 
 
 Supports JPG/PNG.
 
-Result:
-<p align="center">
+Results:
+<p align="left">
     <img src="./result.png"/>
+</p>
+
+<p align="right">
+    <img src="./result1.png"/>
 </p>
