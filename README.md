@@ -5,6 +5,8 @@ ASCII Art Creation in Rust
 
 This crate provides basic image processing functions and methods for converting to and from various image formats.
 
+[Colored](https://github.com/mackwic/colored) For Coloring in terminal
+
 Supports JPG/PNG.
 
 Results:
