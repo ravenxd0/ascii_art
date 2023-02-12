@@ -49,9 +49,8 @@ fn main() {
     }
     args.next();
     let image = args.next().unwrap();
-
     let colored = args.next().is_some();
-    println!("{colored}");
+
     // Load the image
     let image = image::open(image).unwrap();
     // Resize the image
